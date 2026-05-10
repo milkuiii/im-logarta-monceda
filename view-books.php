@@ -1,6 +1,14 @@
 <?php
     $page_type = 'app';
+    include 'includes/db.php';
     include 'includes/header.php';
+
+    // Fetch books from Supabase
+    $response = supabase_request('GET', 'tblbook?select=*');
+    $books = [];
+    if (isset($response['status']) && $response['status'] === 200) {
+        $books = $response['data'];
+    }
 ?>
 
 <!DOCTYPE html>
@@ -26,49 +34,42 @@
 
         <section class="browse-section">
             <div class="browse-by">
-                <h3>BROWSE BY</h3>
-                <div class="filter-pills">
+                <h3>BROWSE</h3>
+                <!-- <div class="filter-pills">
                     <span class="filter-pill active">CATEGORY</span>
                     <span class="filter-pill">DEPARTMENT</span>
                     <span class="filter-pill">POPULAR</span>
-                </div>
+                </div> -->
             </div>
 
-            <h4 class="results-title">Auto-Biography Category</h4>
+            <h4 class="results-title">All Books</h4>
 
-            <div class="item-card">
-                <div class="item-info">
-                    <h4>Lorem Ipsum Title</h4>
-                    <div class="item-meta">Author Name | 3rd Edition: 128 pages</div>
-                    <p class="item-desc">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."</p>
+            <?php if (!empty($books)): ?>
+                <?php foreach ($books as $book): ?>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4><?php echo htmlspecialchars($book['title'] ?? 'Unknown Title'); ?></h4>
+                        <div class="item-meta">
+                            <?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?> | 
+                            <?php echo htmlspecialchars($book['genre'] ?? 'Unknown Genre'); ?>
+                        </div>
+                        <p class="item-desc">No description available.</p>
+                    </div>
+                    <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
                 </div>
-                <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
-            </div>
-            <div class="item-card">
-                <div class="item-info">
-                    <h4>Lorem Ipsum Title</h4>
-                    <div class="item-meta">Author Name | 3rd Edition: 128 pages</div>
-                    <p class="item-desc">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."</p>
-                </div>
-                <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
-            </div>
-            <div class="item-card">
-                <div class="item-info">
-                    <h4>Lorem Ipsum Title</h4>
-                    <div class="item-meta">Author Name | 3rd Edition: 128 pages</div>
-                    <p class="item-desc">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."</p>
-                </div>
-                <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
-            </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p style="padding: 20px; color: #666; font-family: var(--font-primary);">No books found in the database.</p>
+            <?php endif; ?>
 
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <span>&lt;</span>
                 <span style="border-bottom: 3px solid var(--primary-red); padding-bottom: 4px;">1</span>
                 <span>2</span>
                 <span>...</span>
                 <span>16</span>
                 <span>&gt;</span>
-            </div>
+            </div> -->
         </section>
 
         <section class="cta-footer">

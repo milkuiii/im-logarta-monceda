@@ -1,6 +1,14 @@
 <?php
     $page_type = 'app';
+    include 'includes/db.php';
     include 'includes/header.php';
+
+    // Fetch books from Supabase
+    $response = supabase_request('GET', 'tblroom?select=*');
+    $rooms = [];
+    if (isset($response['status']) && $response['status'] === 200) {
+        $rooms = $response['data'];
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +35,24 @@
                 <h3>BROWSE AVAILABLE ROOMS</h3>
             </div>
 
+            <?php if (!empty($rooms)): ?>
+                <?php foreach ($rooms as $room): ?>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4><?php echo htmlspecialchars($room['name'] ?? 'Unknown Name'); ?></h4>
+                        <div class="item-meta">
+                            CAPACITY: <?php echo htmlspecialchars($room['capacity'] ?? 'Unknown Capacity'); ?>
+
+                        </div>
+                    </div>
+                    <a href="calendar.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
+                </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p style="padding: 20px; color: #666; font-family: var(--font-primary);">No rooms found in the database.</p>
+            <?php endif; ?>
+
+<!-- 
             <div class="item-card">
                 <div class="item-info">
                     <h4>Room Name</h4>
@@ -52,16 +78,16 @@
                     <p class="item-desc">Capacity: 4 people maximum</p>
                 </div>
                 <a href="calendar.php" class="btn-item-action" style="border-radius: 8px; font-size: 0.9rem; text-decoration: none; display: inline-block; text-align: center;">VIEW TIMESLOTS</a>
-            </div>
+            </div> -->
 
-            <div class="pagination">
+            <!-- <div class="pagination">
                 <span>&lt;</span>
                 <span style="border-bottom: 3px solid var(--primary-red); padding-bottom: 4px;">1</span>
                 <span>2</span>
                 <span>...</span>
                 <span>16</span>
                 <span>&gt;</span>
-            </div>
+            </div> -->
         </section>
 
         <section class="cta-footer">
