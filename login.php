@@ -1,5 +1,7 @@
 <?php
-    session_start(); // Start the session to remember the user
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     include 'includes/db.php';
 
     $error = "";
