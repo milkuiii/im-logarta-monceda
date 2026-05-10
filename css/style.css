@@ -85,7 +85,7 @@ nav ul li a:hover {
 /* Hero Section */
 .hero {
     height: 75vh;
-    background: linear-gradient(rgba(145, 17, 25, 0.75), rgba(145, 17, 25, 0.75)), url('img/library.png') center/cover;
+    background: linear-gradient(rgba(145, 17, 25, 0.75), rgba(145, 17, 25, 0.75)), url('/assets/img/library.png') center/cover;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -194,7 +194,7 @@ nav ul li a:hover {
 
 /* Auth Pages */
 .auth-container {
-    background: linear-gradient(rgba(145, 17, 25, 0.75), rgba(145, 17, 25, 0.75)), url('img/library.png') center/cover;
+    background: linear-gradient(rgba(145, 17, 25, 0.75), rgba(145, 17, 25, 0.75)), url('/assets/img/library.png') center/cover;
     min-height: 85vh;
     display: flex;
     justify-content: center;
@@ -272,7 +272,7 @@ nav ul li a:hover {
 
 /* Browse Shared Layout */
 .browse-header {
-    background: linear-gradient(rgba(145, 17, 25, 0.75), rgba(145, 17, 25, 0.75)), url('img/library.png') center/cover;
+    background: linear-gradient(rgba(145, 17, 25, 0.75), rgba(145, 17, 25, 0.75)), url('/assets/img/library.png') center/cover;
     padding: 6rem 10% 8rem;
     text-align: center;
     color: #fff;

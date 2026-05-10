@@ -1,27 +1,17 @@
+<?php
+    $page_type = 'profile';
+    include 'includes/header.php';
+    ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReServe - User Profile</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="logo-container">
-            <img src="img/citu-logo.png">
-            <span class="logo-text">ReServe</span>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">HOME</a></li>
-                <li><a href="#">ABOUT</a></li>
-                <li><a href="view-rooms.html">VIEW ROOMS</a></li>
-                <li><a href="view-books.html">VIEW BOOKS</a></li>
-                <li><a href="profile.html" style="display: flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> JOHN.DOE</a></li>
-            </ul>
-        </nav>
-    </header>
 
     <main class="auth-container">
         <div class="auth-card" style="max-width: 900px; padding: 4rem;">
@@ -49,8 +39,8 @@
                 </div>
                 
                 <div style="display: flex; gap: 20px; justify-content: center; margin-top: 2rem;">
-                    <a href="index.html" class="btn-auth-submit" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 45%;">SAVE CHANGES</a>
-                    <a href="index.html" class="btn-auth-submit" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 45%; background-color: transparent; border: 3px solid var(--primary-red); color: var(--primary-red);">CANCEL</a>
+                    <a href="index.php" class="btn-auth-submit" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 45%;">SAVE CHANGES</a>
+                    <a href="index.php" class="btn-auth-submit" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 45%; background-color: transparent; border: 3px solid var(--primary-red); color: var(--primary-red);">CANCEL</a>
                 </div>
             </form>
         </div>
@@ -60,15 +50,15 @@
         <div class="cta-text">
             <h2>RESERVE WITH EASE TODAY</h2>
             <p>Plan smarter, study better.</p>
-            <a href="signup.html" class="btn-get-started">Get started</a>
+            <a href="signup.php" class="btn-get-started">Get started</a>
         </div>
         <div class="footer-menu">
             <div class="footer-menu-column">
                 <h3>Menu</h3>
                 <ul>
                     <li><a href="#">About</a></li>
-                    <li><a href="view-rooms.html">View Rooms</a></li>
-                    <li><a href="view-books.html">View Books</a></li>
+                    <li><a href="view-rooms.php">View Rooms</a></li>
+                    <li><a href="view-books.php">View Books</a></li>
                 </ul>
             </div>
             <div class="footer-menu-column">

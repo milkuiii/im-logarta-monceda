@@ -1,30 +1,16 @@
-
+<?php
+    $page_type = 'landing';
+    include 'includes/header.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReServe - Library Reservation System</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="logo-container">
-            <img src="img/citu-logo.png">
-            <span class="logo-text">ReServe</span>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">HOME</a></li>
-                <li><a href="#">ABOUT</a></li>
-                <li><a href="view-rooms.html">VIEW ROOMS</a></li>
-                <li><a href="view-books.html">VIEW BOOKS</a></li>
-                <li><a href="login.html">LOG IN</a></li>
-                <li><a href="signup.html" class="btn-signup">SIGN UP</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <main>
         <section class="hero">
             <h1>RESERVE <br>with <span class="ease-text">Ease</span></h1>
@@ -35,15 +21,15 @@
             <div class="cta-text">
                 <h2>RESERVE WITH EASE TODAY</h2>
                 <p>Plan smarter, study better.</p>
-                <a href="signup.html" class="btn-get-started">Get started</a>
+                <a href="signup.php" class="btn-get-started">Get started</a>
             </div>
             <div class="footer-menu">
                 <div class="footer-menu-column">
                     <h3>Menu</h3>
                     <ul>
                         <li><a href="#">About</a></li>
-                        <li><a href="view-rooms.html">View Rooms</a></li>
-                        <li><a href="view-books.html">View Books</a></li>
+                        <li><a href="view-rooms.php">View Rooms</a></li>
+                        <li><a href="view-books.php">View Books</a></li>
                     </ul>
                 </div>
                 <div class="footer-menu-column">
@@ -59,16 +45,7 @@
         </section>
     </main>
 
-    <footer class="copyright-bar">
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">University Hotline</a>
-            <a href="#">Legal</a>
-            <a href="#">Site Map</a>
-        </div>
-        <div>© 2021 All Rights Reserved</div>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
 

@@ -1,29 +1,17 @@
+<?php
+    $page_type = 'reserve-book';
+    include 'includes/header.php';
 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReServe - Reserve Book</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <div class="logo-container">
-            <img src="img/citu-logo.png">
-            <span class="logo-text">ReServe</span>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">HOME</a></li>
-                <li><a href="#">ABOUT</a></li>
-                <li><a href="view-rooms.html">VIEW ROOMS</a></li>
-                <li><a href="view-books.html">VIEW BOOKS</a></li>
-                <li><a href="profile.html" style="display: flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> JOHN.DOE</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <main class="auth-container">
         <div class="auth-card" style="max-width: 900px; padding: 4rem;">
             <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">RESERVE BOOK</h2>
@@ -46,7 +34,7 @@
                 
                 <p style="text-align: center; color: var(--accent-yellow); font-weight: 800; margin-top: 3rem; font-size: 1.1rem;">By Reserving, I agree to the <a href="#" style="color: var(--accent-yellow);">Terms of Service</a> of the College Library.</p>
                 
-                <a href="confirm.html" class="btn-auth-submit" style="width: 50%; text-decoration: none; display: block; text-align: center; margin: 0 auto;">RESERVE</a>
+                <a href="confirm.php" class="btn-auth-submit" style="width: 50%; text-decoration: none; display: block; text-align: center; margin: 0 auto;">RESERVE</a>
             </form>
         </div>
     </main>
@@ -55,15 +43,15 @@
         <div class="cta-text">
             <h2>RESERVE WITH EASE TODAY</h2>
             <p>Plan smarter, study better.</p>
-            <a href="signup.html" class="btn-get-started">Get started</a>
+            <a href="signup.php" class="btn-get-started">Get started</a>
         </div>
         <div class="footer-menu">
             <div class="footer-menu-column">
                 <h3>Menu</h3>
                 <ul>
                     <li><a href="#">About</a></li>
-                    <li><a href="view-rooms.html">View Rooms</a></li>
-                    <li><a href="view-books.html">View Books</a></li>
+                    <li><a href="view-rooms.php">View Rooms</a></li>
+                    <li><a href="view-books.php">View Books</a></li>
                 </ul>
             </div>
             <div class="footer-menu-column">
@@ -78,16 +66,7 @@
         </div>
     </section>
 
-    <footer class="copyright-bar">
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">University Hotline</a>
-            <a href="#">Legal</a>
-            <a href="#">Site Map</a>
-        </div>
-        <div>© 2021 All Rights Reserved</div>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
 
