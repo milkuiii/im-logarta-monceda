@@ -1,18 +1,18 @@
 <?php
-// 1. Session check MUST be at the very top, before ANY HTML or spaces
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+    // 1. Session check MUST be at the very top, before ANY HTML or spaces
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-// 2. Security check
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+    // 2. Security check
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit();
+    }
 
-include 'includes/db.php';
-$page_type = 'system'; 
-include 'includes/header.php'; 
+    include 'includes/db.php';
+    $page_type = 'system'; 
+    include 'includes/header.php'; 
 ?>
 
 <main class="auth-container">
