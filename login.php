@@ -27,6 +27,7 @@
                 $_SESSION['fname'] = $user['fname'];
                 $_SESSION['lname'] = $user['lname'];
                 $_SESSION['isStudent'] = $user['isStudent'];
+                $_SESSION['email'] = $user['email'];
 
                 header("Location: view-books.php");
                 exit();
