@@ -59,7 +59,7 @@
             <?php endif; ?>
             <form id="loginForm" method="POST" action="login.php">
                 <div class="form-group">
-                    <label for="email">INSTITUIONAL EMAIL</label>
+                    <label for="email">INSTITUTIONAL EMAIL</label>
                     <input type="text" id="email" name="email" required>
                 </div>
                 <div class="form-group">
