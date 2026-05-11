@@ -41,6 +41,10 @@
                 <a href="view-books.php" class="btn-auth-submit" style="text-decoration: none; display: flex; align-items: center; justify-content: center; margin: 0; width: 45%; background-color: transparent; border: 3px solid var(--primary-red); color: var(--primary-red);">CANCEL</a>
             </div>
         </form>
+
+        <form action="delete_account.php" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');" style="margin-top: 1rem; display: flex; justify-content: center;">
+            <button type="submit" class="btn-auth-submit" style="margin: 0; width: calc(90% + 20px); background-color: #dc3545; color: white; border: none; cursor: pointer;">DELETE ACCOUNT</button>
+        </form>
     </div>
 </main>
 
