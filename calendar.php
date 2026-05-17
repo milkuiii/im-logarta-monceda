@@ -16,6 +16,7 @@
     }
     $target_room_id = $_GET['id'];
 
+    // 1. Fetch Room Details
     $endpoint = "tblroom?id=eq." . urlencode($target_room_id) . "&select=*";
     $response = supabase_request("GET", $endpoint);
     $roomData = $response['data'];
@@ -26,8 +27,25 @@
     }
     $room = $roomData[0];
 
+    // 2. QUERY LOGIC ADDED: Fetch all current reservations for this room
+    $resEndpoint = "tblreservation?room_id=eq." . urlencode($target_room_id) . "&select=date_start,date_end";
+    $resResponse = supabase_request("GET", $resEndpoint);
+    $existingBookings = [];
+    if (isset($resResponse['status']) && $resResponse['status'] === 200) {
+        $existingBookings = $resResponse['data'];
+    }
+
+    // 3. LEDGER FORMATTER ADDED: Combine date & timeslots to match your js/calendar.js matrix
+    $takenSlots = [];
+    foreach ($existingBookings as $booking) {
+        $dateKey = date("Y-m-d", strtotime($booking['date_start']));
+        $slotText = date("h:i A", strtotime($booking['date_start'])) . " - " . date("h:i A", strtotime($booking['date_end']));
+        $takenSlots[] = $dateKey . "||" . $slotText;
+    }
+
     $error = "";
 
+    // 4. Handle Post Request Form Submissions
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $reservation_date = $_POST['reservation_date'];
         $selected_slot = $_POST['timeslot']; 
@@ -41,24 +59,29 @@
             $date_start = date("Y-m-d H:i:s", strtotime("$reservation_date $start_str"));
             $date_end   = date("Y-m-d H:i:s", strtotime("$reservation_date $end_str"));
 
-            // Match your exact database column keys
-            $reservationData = [
-                'user_id'    => $user_id,
-                'room_id'    => intval($target_room_id),
-                'book_id'    => null, // Nullable because it maps strictly to a room here
-                'date_start' => $date_start, // Matches timestamp column layout
-                'date_end'   => $date_end,   // Matches timestamp column layout
-                'is_room'    => true,        // Tracks room reservations explicitly
-                'isApproved' => false         // Awaits administrative moderation review
-            ];
-
-            $res = supabase_request("POST", "tblreservation", $reservationData);
-
-            if ($res['status'] >= 200 && $res['status'] < 300) {
-                header("Location: confirm.php?type=room");
-                exit();
+            // Defensive Check: Stop double booking on form submission
+            $conflictKey = $reservation_date . "||" . $selected_slot;
+            if (in_array($conflictKey, $takenSlots)) {
+                $error = "This room timeslot has just been booked by another student. Please select a different slot.";
             } else {
-                $error = "Failed to secure room booking reservation. Please try a different slot.";
+                $reservationData = [
+                    'user_id'    => $user_id,
+                    'room_id'    => intval($target_room_id),
+                    'book_id'    => null, 
+                    'date_start' => $date_start, 
+                    'date_end'   => $date_end,   
+                    'is_room'    => true,        
+                    'isApproved' => false         
+                ];
+
+                $res = supabase_request("POST", "tblreservation", $reservationData);
+
+                if ($res['status'] >= 200 && $res['status'] < 300) {
+                    header("Location: confirm.php?type=room");
+                    exit();
+                } else {
+                    $error = "Failed to secure room booking reservation. Please try a different slot.";
+                }
             }
         }
     }
@@ -87,7 +110,6 @@
             <?php endif; ?>
 
             <form method="POST" action="calendar.php?id=<?php echo urlencode($target_room_id); ?>">
-                
                 <div class="form-group" style="margin-bottom: 4rem;">
                     <label for="reservation_date" style="font-size: 1.5rem; text-align: center; display: block; margin-bottom: 1rem; color: var(--primary-red); font-weight: 900;">SELECT RESERVATION DATE</label>
                     <input type="date" id="reservation_date" name="reservation_date" required min="<?php echo date('Y-m-d'); ?>" style="width: 100%; padding: 1.2rem; border-radius: 20px; border: 3px solid var(--primary-red); font-size: 1.2rem; font-weight: 800; color: var(--primary-red); text-align: center; background-color: #fff;">
@@ -108,7 +130,7 @@
                         ];
                         foreach ($slots as $index => $slot):
                         ?>
-                        <label class="timeslot-label" style="display: block; cursor: pointer;">
+                        <label class="timeslot-label" data-slot-value="<?php echo $slot; ?>" style="display: block; cursor: pointer;">
                             <input type="radio" name="timeslot" value="<?php echo $slot; ?>" required style="display: none;" onclick="highlightSlot(this)">
                             <div class="timeslot-tile" style="background-color: #fff; padding: 1.2rem; border-radius: 20px; text-align: center; font-weight: 800; color: var(--text-dark); border: 3px solid transparent; transition: all 0.2s;">
                                 <?php echo $slot; ?>
@@ -126,23 +148,6 @@
             </form>
         </div>
     </main>
-
-    <script>
-    function highlightSlot(radioInput) {
-        // Clear active styles from all tiles
-        document.querySelectorAll('.timeslot-tile').forEach(tile => {
-            tile.style.backgroundColor = '#fff';
-            tile.style.color = 'var(--text-dark)';
-            tile.style.borderColor = 'transparent';
-        });
-        
-        // Apply active accent-yellow theme properties to the selected option
-        const targetTile = radioInput.nextElementSibling;
-        targetTile.style.backgroundColor = 'var(--accent-yellow)';
-        targetTile.style.color = 'var(--primary-red)';
-        targetTile.style.borderColor = 'var(--primary-red)';
-    }
-    </script>
 
     <section class="cta-footer">
         <div class="cta-text">
@@ -170,5 +175,10 @@
             </div>
         </div>
     </section>
+
+    <script>
+        window.takenSlotsLedger = <?php echo json_encode($takenSlots); ?>;
+    </script>
+    <script src="js/calendar.js"></script>
 
 <?php include 'includes/footer.php'; ?>

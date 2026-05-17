@@ -29,6 +29,13 @@
                 $_SESSION['isStudent'] = $user['isStudent'];
                 $_SESSION['email'] = $user['email'];
 
+                $_SESSION['isAdmin']    = filter_var($user['isAdmin'], FILTER_VALIDATE_BOOLEAN);
+
+                if ($_SESSION['isAdmin'] === true) {
+                    header("Location: admin-dashboard.php");
+                    exit();
+                }
+
                 header("Location: view-books.php");
                 exit();
             } else {

@@ -3,14 +3,23 @@
     include 'includes/db.php';
     include 'includes/header.php';
 
-    // Fetch books from Supabase
-    $response = supabase_request('GET', 'tblbook?select=*');
+    // 1. Fetch all catalog books from Supabase
+    $bookResponse = supabase_request('GET', 'tblbook?select=*');
     $books = [];
-    if (isset($response['status']) && $response['status'] === 200) {
-        $books = $response['data'];
+    if (isset($bookResponse['status']) && $bookResponse['status'] === 200) {
+        $books = $bookResponse['data'];
+    }
+
+    // 2. Fetch just the book_id column from tblreservation
+    // This tells us exactly which books have an ongoing reservation entry
+    $reservationResponse = supabase_request('GET', 'tblreservation?book_id=not.is.null&select=book_id');
+    $reservedBookIds = [];
+    
+    if (isset($reservationResponse['status']) && $reservationResponse['status'] === 200) {
+        // Extract just the raw IDs into a flat, clean array: [1, 4, 7, etc.]
+        $reservedBookIds = array_column($reservationResponse['data'], 'book_id');
     }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,18 +55,29 @@
 
             <?php if (!empty($books)): ?>
                 <?php foreach ($books as $book): ?>
-                <div class="item-card">
-                    <div class="item-info">
-                        <h4><?php echo htmlspecialchars($book['title'] ?? 'Unknown Title'); ?></h4>
-                        <div class="item-meta">
-                            <?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?> | 
-                            <?php echo htmlspecialchars($book['genre'] ?? 'Unknown Genre'); ?>
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h4><?php echo htmlspecialchars($book['title'] ?? 'Unknown Title'); ?></h4>
+                            <div class="item-meta">
+                                <?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?> | 
+                                <?php echo htmlspecialchars($book['genre'] ?? 'Unknown Genre'); ?>
+                            </div>
+                            <p class="item-desc"><?php echo htmlspecialchars($book['description'] ?? 'Description not found...'); ?></p>
                         </div>
-                        <p class="item-desc"><?php echo htmlspecialchars($book['description'] ?? 'Description not found...'); ?></p>
+                        
+                        <?php 
+                        // Check if the current book's ID exists anywhere in the reservation list
+                        if (in_array($book['id'], $reservedBookIds)): 
+                        ?>
+                            <button class="btn-item-action" style="background-color: #ccc; cursor: not-allowed; border: none; text-decoration: none; display: inline-block; text-align: center;" disabled>
+                                BORROWED
+                            </button>
+                        <?php else: ?>
+                            <a href="reserve-book.php?id=<?php echo $book['id']; ?>" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">
+                                RESERVE
+                            </a>
+                        <?php endif; ?>
                     </div>
-                    <a href="reserve-book.php?id=<?php echo $book['id']; ?>" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
-                    <!-- <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a> -->
-                </div>
                 <?php endforeach; ?>
             <?php else: ?>
                 <p style="padding: 20px; color: #666; font-family: var(--font-primary);">No books found in the database.</p>
