@@ -109,7 +109,7 @@
                 </p>
             <?php endif; ?>
 
-            <form method="POST" action="calendar.php?id=<?php echo urlencode($target_room_id); ?>">
+            <form id="calendarForm" method="POST" action="calendar.php?id=<?php echo urlencode($target_room_id); ?>">
                 <div class="form-group" style="margin-bottom: 4rem;">
                     <label for="reservation_date" style="font-size: 1.5rem; text-align: center; display: block; margin-bottom: 1rem; color: var(--primary-red); font-weight: 900;">SELECT RESERVATION DATE</label>
                     <input type="date" id="reservation_date" name="reservation_date" required min="<?php echo date('Y-m-d'); ?>" style="width: 100%; padding: 1.2rem; border-radius: 20px; border: 3px solid var(--primary-red); font-size: 1.2rem; font-weight: 800; color: var(--primary-red); text-align: center; background-color: #fff;">
@@ -180,5 +180,51 @@
         window.takenSlotsLedger = <?php echo json_encode($takenSlots); ?>;
     </script>
     <script src="js/calendar.js"></script>
+
+    <!-- Room Reservation Confirmation Modal -->
+    <div id="roomModal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <h3 class="custom-modal-title">Confirm Room Booking</h3>
+            <div class="custom-modal-body" id="roomModalBody">
+            </div>
+            <div class="custom-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeRoomModal()">Edit</button>
+                <button type="button" class="btn-modal-confirm" onclick="confirmRoomReservation()">Reserve</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const calendarForm = document.getElementById('calendarForm');
+        const roomModal = document.getElementById('roomModal');
+        const roomModalBody = document.getElementById('roomModalBody');
+
+        calendarForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reservationDate = document.getElementById('reservation_date').value;
+            const selectedSlot = document.querySelector('input[name="timeslot"]:checked');
+            
+            if (!selectedSlot) {
+                alert("Please select a timeslot first.");
+                return;
+            }
+
+            roomModalBody.innerHTML = `
+                <p>Date: <span>${reservationDate}</span></p>
+                <p>Timeslot: <span>${selectedSlot.value}</span></p>
+            `;
+            
+            roomModal.classList.add('active');
+        });
+
+        function closeRoomModal() {
+            roomModal.classList.remove('active');
+        }
+
+        function confirmRoomReservation() {
+            calendarForm.submit();
+        }
+    </script>
 
 <?php include 'includes/footer.php'; ?>

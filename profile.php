@@ -31,7 +31,7 @@
                 <p style="color: green; text-align: center; font-weight: bold; margin-bottom: 2rem;">Profile updated successfully!</p>
             <?php endif; ?>
 
-            <form action="update_profile.php" method="POST">
+            <form id="profileForm" action="update_profile.php" method="POST">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="form-group">
                         <label for="first_name">FIRST NAME</label>
@@ -131,5 +131,48 @@
             </div>
         </div>
     </section>
+
+    <!-- Profile Confirmation Modal -->
+    <div id="profileModal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <h3 class="custom-modal-title">Confirm Profile Update</h3>
+            <div class="custom-modal-body" id="profileModalBody">
+            </div>
+            <div class="custom-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeProfileModal()">Edit</button>
+                <button type="button" class="btn-modal-confirm" onclick="confirmProfile()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const profileForm = document.getElementById('profileForm');
+        const profileModal = document.getElementById('profileModal');
+        const profileModalBody = document.getElementById('profileModalBody');
+
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fname = document.getElementById('first_name').value;
+            const lname = document.getElementById('last_name').value;
+            const email = document.getElementById('email').value;
+
+            profileModalBody.innerHTML = `
+                <p>Email: <span>${email}</span></p>
+                <p>First Name: <span>${fname}</span></p>
+                <p>Last Name: <span>${lname}</span></p>
+            `;
+            
+            profileModal.classList.add('active');
+        });
+
+        function closeProfileModal() {
+            profileModal.classList.remove('active');
+        }
+
+        function confirmProfile() {
+            profileForm.submit();
+        }
+    </script>
 
 <?php include 'includes/footer.php'; ?>

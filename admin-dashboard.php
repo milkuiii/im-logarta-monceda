@@ -75,14 +75,14 @@ include 'includes/header.php';
                             <span style="background-color: #E8F5E9; color: #2E7D32; padding: 12px 24px; border-radius: 100px; font-weight: 800; font-size: 0.9rem; text-align: center; border: 2px solid #2E7D32; text-transform: uppercase; letter-spacing: 1px;">
                                 APPROVED
                             </span>
-                            <a href="process-reservation.php?id=<?php echo $res['id']; ?>&status=deny" style="color: var(--primary-red); font-size: 0.85rem; font-weight: 800; text-align: center; text-decoration: underline;">
+                            <a href="process-reservation.php?id=<?php echo $res['id']; ?>&status=deny" style="color: var(--primary-red); font-size: 0.85rem; font-weight: 800; text-align: center; text-decoration: underline;" onclick="return confirm('Are you sure you want to revoke this reservation?');">
                                 Revoke Access
                             </a>
                         <?php else: ?>
-                            <a href="process-reservation.php?id=<?php echo $res['id']; ?>&status=approve" class="btn-item-action" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 100%;">
+                            <a href="process-reservation.php?id=<?php echo $res['id']; ?>&status=approve" class="btn-item-action" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 100%;" onclick="return confirm('Are you sure you want to approve this reservation?');">
                                 APPROVE
                             </a>
-                            <a href="process-reservation.php?id=<?php echo $res['id']; ?>&status=deny" class="btn-item-action" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 100%; background-color: transparent; border: 3px solid var(--primary-red); color: var(--primary-red);">
+                            <a href="process-reservation.php?id=<?php echo $res['id']; ?>&status=deny" class="btn-item-action" style="text-decoration: none; display: block; text-align: center; margin: 0; width: 100%; background-color: transparent; border: 3px solid var(--primary-red); color: var(--primary-red);" onclick="return confirm('Are you sure you want to deny this reservation?');">
                                 DENY
                             </a>
                         <?php endif; ?>

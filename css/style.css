@@ -619,3 +619,83 @@ nav ul li a:hover {
     .auth-card { padding: 2rem; border-radius: 40px; }
 }
 
+/* Custom Modal Popups */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.custom-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.custom-modal-content {
+    background-color: var(--card-bg);
+    padding: 3rem;
+    border-radius: 40px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+.custom-modal-overlay.active .custom-modal-content {
+    transform: translateY(0);
+}
+.custom-modal-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary-red);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+.custom-modal-body {
+    text-align: left;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 2px solid #E0E0E0;
+}
+.custom-modal-body p {
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+}
+.custom-modal-body span {
+    font-weight: 800;
+    color: var(--primary-red);
+}
+.custom-modal-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+.btn-modal-confirm, .btn-modal-cancel {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    border-radius: 100px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: none;
+    flex: 1;
+}
+.btn-modal-confirm {
+    background-color: var(--primary-red);
+    color: #fff;
+}
+.btn-modal-cancel {
+    background-color: transparent;
+    border: 3px solid var(--primary-red);
+    color: var(--primary-red);
+}

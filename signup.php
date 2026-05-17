@@ -177,5 +177,61 @@
 
     <?php include 'includes/footer.php'; ?>
     <script src="js/signup.js"></script>
+
+    <!-- Signup Confirmation Modal -->
+    <div id="signupModal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <h3 class="custom-modal-title">Confirm Your Info</h3>
+            <div class="custom-modal-body" id="signupModalBody">
+            </div>
+            <div class="custom-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeSignupModal()">Edit</button>
+                <button type="button" class="btn-modal-confirm" onclick="confirmSignup()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        const signupModal = document.getElementById('signupModal');
+        const signupModalBody = document.getElementById('signupModalBody');
+
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const fname = document.getElementById('firstname').value;
+            const lname = document.getElementById('lastname').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            
+            let extraInfo = '';
+            if (role === 'student') {
+                const program = document.getElementById('program').value;
+                const year = document.getElementById('year').options[document.getElementById('year').selectedIndex]?.text || '';
+                extraInfo = `<p>Program: <span>${program}</span></p>
+                             <p>Year Level: <span>${year}</span></p>`;
+            } else if (role === 'faculty') {
+                const department = document.getElementById('department').value;
+                extraInfo = `<p>Department: <span>${department}</span></p>`;
+            }
+
+            signupModalBody.innerHTML = `
+                <p>Email: <span>${email}</span></p>
+                <p>Name: <span>${fname} ${lname}</span></p>
+                <p>Role: <span style="text-transform: capitalize;">${role}</span></p>
+                ${extraInfo}
+            `;
+            
+            signupModal.classList.add('active');
+        });
+
+        function closeSignupModal() {
+            signupModal.classList.remove('active');
+        }
+
+        function confirmSignup() {
+            signupForm.submit();
+        }
+    </script>
 </body>
 </html>

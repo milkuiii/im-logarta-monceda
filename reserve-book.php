@@ -84,7 +84,7 @@
                 </p>
             </div>
 
-            <form method="POST" action="reserve-book.php?id=<?php echo urlencode($target_book_id); ?>">
+            <form id="reserveBookForm" method="POST" action="reserve-book.php?id=<?php echo urlencode($target_book_id); ?>">
                 <div class="form-group">
                     <label for="start_date">DATE OF START</label>
                     <input type="date" id="start_date" name="start_date" required min="<?php echo date('Y-m-d'); ?>">
@@ -131,5 +131,52 @@
             </div>
         </div>
     </section>
+
+    <!-- Book Reservation Confirmation Modal -->
+    <div id="bookModal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <h3 class="custom-modal-title">Confirm Book Reservation</h3>
+            <div class="custom-modal-body" id="bookModalBody">
+            </div>
+            <div class="custom-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeBookModal()">Edit</button>
+                <button type="button" class="btn-modal-confirm" onclick="confirmBookReservation()">Reserve</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const reserveBookForm = document.getElementById('reserveBookForm');
+        const bookModal = document.getElementById('bookModal');
+        const bookModalBody = document.getElementById('bookModalBody');
+
+        reserveBookForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            // Check that end date is later than start date
+            if (new Date(endDate) <= new Date(startDate)) {
+                alert("The end date must be later than the start date.");
+                return;
+            }
+
+            bookModalBody.innerHTML = `
+                <p>Start Date: <span>${startDate}</span></p>
+                <p>End Date: <span>${endDate}</span></p>
+            `;
+            
+            bookModal.classList.add('active');
+        });
+
+        function closeBookModal() {
+            bookModal.classList.remove('active');
+        }
+
+        function confirmBookReservation() {
+            reserveBookForm.submit();
+        }
+    </script>
 
 <?php include 'includes/footer.php'; ?>
