@@ -45,7 +45,8 @@
 
                         </div>
                     </div>
-                    <a href="calendar.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
+                    <a href="calendar.php?id=<?php echo urlencode($room['id']); ?>" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
+                    <!-- <a href="calendar.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a> -->
                 </div>
                 <?php endforeach; ?>
             <?php else: ?>
