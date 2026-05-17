@@ -3,12 +3,19 @@
     include 'includes/db.php';
     include 'includes/header.php';
 
-    // Fetch books from Supabase
+    // Fetch rooms from Supabase
     $response = supabase_request('GET', 'tblroom?select=*');
     $rooms = [];
     if (isset($response['status']) && $response['status'] === 200) {
         $rooms = $response['data'];
     }
+
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) $page = 1;
+    $limit = 5;
+    $total_rooms = count($rooms);
+    $total_pages = ceil($total_rooms / $limit);
+    $rooms_on_page = array_slice($rooms, ($page - 1) * $limit, $limit);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,8 +42,8 @@
                 <h3>BROWSE AVAILABLE ROOMS</h3>
             </div>
 
-            <?php if (!empty($rooms)): ?>
-                <?php foreach ($rooms as $room): ?>
+            <?php if (!empty($rooms_on_page)): ?>
+                <?php foreach ($rooms_on_page as $room): ?>
                 <div class="item-card">
                     <div class="item-info">
                         <h4><?php echo htmlspecialchars($room['name'] ?? 'Unknown Name'); ?></h4>
@@ -81,14 +88,29 @@
                 <a href="calendar.php" class="btn-item-action" style="border-radius: 8px; font-size: 0.9rem; text-decoration: none; display: inline-block; text-align: center;">VIEW TIMESLOTS</a>
             </div> -->
 
-            <!-- <div class="pagination">
-                <span>&lt;</span>
-                <span style="border-bottom: 3px solid var(--primary-red); padding-bottom: 4px;">1</span>
-                <span>2</span>
-                <span>...</span>
-                <span>16</span>
-                <span>&gt;</span>
-            </div> -->
+            <?php if ($total_pages > 1): ?>
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="view-rooms.php?page=<?php echo $page - 1; ?>" style="text-decoration: none; color: inherit;">&lt;</a>
+                <?php else: ?>
+                    <span style="color: #ccc;">&lt;</span>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <?php if ($i === $page): ?>
+                        <span style="border-bottom: 3px solid var(--primary-red); padding-bottom: 4px;"><?php echo $i; ?></span>
+                    <?php else: ?>
+                        <a href="view-rooms.php?page=<?php echo $i; ?>" style="text-decoration: none; color: inherit;"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="view-rooms.php?page=<?php echo $page + 1; ?>" style="text-decoration: none; color: inherit;">&gt;</a>
+                <?php else: ?>
+                    <span style="color: #ccc;">&gt;</span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </section>
 
         <section class="cta-footer">

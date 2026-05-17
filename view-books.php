@@ -10,6 +10,13 @@
         $books = $bookResponse['data'];
     }
 
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    if ($page < 1) $page = 1;
+    $limit = 5;
+    $total_books = count($books);
+    $total_pages = ceil($total_books / $limit);
+    $books_on_page = array_slice($books, ($page - 1) * $limit, $limit);
+
     // 2. Fetch just the book_id column from tblreservation
     // This tells us exactly which books have an ongoing reservation entry
     $reservationResponse = supabase_request('GET', 'tblreservation?book_id=not.is.null&select=book_id');
@@ -53,8 +60,8 @@
 
             <h4 class="results-title">All Books</h4>
 
-            <?php if (!empty($books)): ?>
-                <?php foreach ($books as $book): ?>
+            <?php if (!empty($books_on_page)): ?>
+                <?php foreach ($books_on_page as $book): ?>
                     <div class="item-card">
                         <div class="item-info">
                             <h4><?php echo htmlspecialchars($book['title'] ?? 'Unknown Title'); ?></h4>
@@ -83,14 +90,29 @@
                 <p style="padding: 20px; color: #666; font-family: var(--font-primary);">No books found in the database.</p>
             <?php endif; ?>
 
-            <!-- <div class="pagination">
-                <span>&lt;</span>
-                <span style="border-bottom: 3px solid var(--primary-red); padding-bottom: 4px;">1</span>
-                <span>2</span>
-                <span>...</span>
-                <span>16</span>
-                <span>&gt;</span>
-            </div> -->
+            <?php if ($total_pages > 1): ?>
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="view-books.php?page=<?php echo $page - 1; ?>" style="text-decoration: none; color: inherit;">&lt;</a>
+                <?php else: ?>
+                    <span style="color: #ccc;">&lt;</span>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <?php if ($i === $page): ?>
+                        <span style="border-bottom: 3px solid var(--primary-red); padding-bottom: 4px;"><?php echo $i; ?></span>
+                    <?php else: ?>
+                        <a href="view-books.php?page=<?php echo $i; ?>" style="text-decoration: none; color: inherit;"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="view-books.php?page=<?php echo $page + 1; ?>" style="text-decoration: none; color: inherit;">&gt;</a>
+                <?php else: ?>
+                    <span style="color: #ccc;">&gt;</span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </section>
 
         <section class="cta-footer">
