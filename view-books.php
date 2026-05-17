@@ -53,9 +53,10 @@
                             <?php echo htmlspecialchars($book['author'] ?? 'Unknown Author'); ?> | 
                             <?php echo htmlspecialchars($book['genre'] ?? 'Unknown Genre'); ?>
                         </div>
-                        <p class="item-desc">No description available.</p>
+                        <p class="item-desc"><?php echo htmlspecialchars($book['description'] ?? 'Description not found...'); ?></p>
                     </div>
-                    <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
+                    <a href="reserve-book.php?id=<?php echo $book['id']; ?>" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a>
+                    <!-- <a href="reserve-book.php" class="btn-item-action" style="text-decoration: none; display: inline-block; text-align: center;">RESERVE</a> -->
                 </div>
                 <?php endforeach; ?>
             <?php else: ?>

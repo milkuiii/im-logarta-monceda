@@ -1,44 +1,72 @@
 <?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     include 'includes/db.php';
+
+    $error = "";
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $fname = $_POST['fname'];
         $lname = $_POST['lname'];
-        $hashed_password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-
-        if (empty($email) || empty($fname) || empty($lname) || empty($_POST['password'])) {
-            echo "<p>All fields are required. Please fill out the form completely.</p>";
-            return;
-        }
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo "<p>Invalid email format.</p>";
-            return;
-        }
-
-        $userData = [
-            'email' => $email,
-            'fname' => $fname,
-            'lname' => $lname,
-            'isStudent' => true,
-            'isFaculty' => false,
-            'isAdmin' => false,
-            'password' => $hashed_password
-        ];
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
         
-        $result = supabase_request("POST", "tbluser", $userData);
-        
-        if ($result['status'] >= 200 && $result['status'] < 300) {
-            header("Location: login.php?signup=success");
-            exit();
+        if ($password !== $confirm_password) {
+            $error = "Passwords do not match.";
         } else {
-            echo "Error creating account. Code: " . $result['status'];
+            $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+            $role = $_POST['role'];
+            
+            $isStudent = ($role === 'student');
+            $isFaculty = ($role === 'faculty');
+
+            // Step 1: Base Account insertion payload
+            $userData = [
+                'email' => $email,
+                'fname' => $fname,
+                'lname' => $lname,
+                'password' => $hashed_password,
+                'isStudent' => $isStudent,
+                'isFaculty' => $isFaculty,
+                'isAdmin' => false 
+            ];
+
+            $userResponse = supabase_request("POST", "tbluser", $userData);
+
+            if ($userResponse['status'] >= 200 && $userResponse['status'] < 300) {
+                $newUser = $userResponse['data'];
+                $newUserId = isset($newUser[0]['id']) ? $newUser[0]['id'] : null;
+
+                if (!$newUserId) {
+                    $fetchResponse = supabase_request("GET", "tbluser?email=eq." . urlencode($email) . "&select=id");
+                    $newUserId = $fetchResponse['data'][0]['id'];
+                }
+
+                if ($isStudent) {
+                    $studentData = [
+                        'uid'     => $newUserId, // Changed key from 'id' to 'uid'
+                        'program' => $_POST['program'],
+                        'year'    => intval($_POST['year']) 
+                    ];
+                    $metaResponse = supabase_request("POST", "tblstudent", $studentData);
+                } else if ($isFaculty) {
+                    $facultyData = [
+                        'uid'        => $newUserId, // Changed key from 'id' to 'uid'
+                        'department' => $_POST['department']
+                    ];
+                    $metaResponse = supabase_request("POST", "tblfaculty", $facultyData);
+                }
+
+                header("Location: login.php?signup=success");
+                exit();
+            } else {
+                $error = "Error writing account profile credentials.";
+            }
         }
     }
-?>
 
-<?php 
     $page_type = 'landing';
     include 'includes/header.php';
 ?>
@@ -54,13 +82,53 @@
                     <input type="email" id="email" name="email" required>
                 </div>
                 <div class="form-group">
-                    <label for="username">FIRST NAME</label>
+                    <label for="firstname">FIRST NAME</label>
                     <input type="text" id="firstname" name="fname" required>
                 </div>
                 <div class="form-group">
-                    <label for="username">LAST NAME</label>
+                    <label for="lastname">LAST NAME</label>
                     <input type="text" id="lastname" name="lname" required>
                 </div>
+
+                <div class="form-group">
+                    <label>I AM A:</label>
+                    <div style="display: flex; gap: 30px; padding: 0.5rem 1rem;">
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-dark); font-size: 1.1rem;">
+                            <input type="radio" name="role" value="student" checked onclick="toggleRoleFields('student')" style="width: auto; margin: 0;"> Student
+                        </label>
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text-dark); font-size: 1.1rem;">
+                            <input type="radio" name="role" value="faculty" onclick="toggleRoleFields('faculty')" style="width: auto; margin: 0;"> Faculty
+                        </label>
+                    </div>
+                </div>
+
+                <div id="student-fields" style="display: block; margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label for="program">PROGRAM / COURSE</label>
+                        <input type="text" id="program" name="program" placeholder="e.g., BSCS">
+                    </div>
+                    <div class="form-group">
+                        <label for="year">YEAR LEVEL</label>
+                        <div style="position: relative; width: 100%;">
+                            <select id="year" name="year" class="custom-dropdown">
+                                <option value="" disabled selected hidden>Select your year level</option>
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                                <option value="5">5th Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="faculty-fields" style="display: none; margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label for="department">DEPARTMENT</label>
+                        <input type="text" id="department" name="department" placeholder="e.g., College of Computer Studies">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="password">PASSWORD</label>
                     <input type="password" id="password" name="password" required>
@@ -69,8 +137,8 @@
                     <label for="confirm_password">CONFIRM PASSWORD</label>
                     <input type="password" id="confirm_password" name="confirm_password" required>
                 </div>
-                <!-- <a href="login.php" class="btn-auth-submit" style="text-decoration: none; display: block; text-align: center;">SIGN UP</a> -->
-                <button type="submit" class="btn-auth-submit" style="width: 100%; border: none; cursor: pointer; display: block; text-align: center;">
+
+                <button type="submit" class="btn-auth-submit">
                     SIGN UP
                 </button>
             </form>
@@ -108,5 +176,6 @@
     </section>
 
     <?php include 'includes/footer.php'; ?>
+    <script src="js/signup.js"></script>
 </body>
 </html>

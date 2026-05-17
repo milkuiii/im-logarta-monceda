@@ -1,40 +1,106 @@
 <?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit();
+    }
+
+    include 'includes/db.php';
+
+    if (!isset($_GET['id']) || empty($_GET['id'])) {
+        header("Location: view-books.php");
+        exit();
+    }
+    $target_book_id = $_GET['id'];
+
+    $endpoint = "tblbook?id=eq." . urlencode($target_book_id) . "&select=*";
+    $response = supabase_request("GET", $endpoint);
+    $bookData = $response['data'];
+
+    if (empty($bookData)) {
+        header("Location: view-books.php?error=book_not_found");
+        exit();
+    }
+    $book = $bookData[0]; 
+
+    $error = "";
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $start_date = $_POST['start_date'];
+        $end_date = $_POST['end_date'];
+        $user_id = $_SESSION['user_id'];
+
+        // Chronological safety validation
+        if (strtotime($start_date) > strtotime($end_date)) {
+            $error = "The end date cannot be earlier than the start date.";
+        } else {
+            $reservationData = [
+                'user_id'    => $user_id,
+                'book_id'    => intval($target_book_id),
+                'room_id'    => null, 
+                'date_start' => $start_date,  // Matches your timestamp column
+                'date_end'   => $end_date,    // Matches your timestamp column
+                'is_room'    => false,        // Explicitly false since this is a book reservation
+                'isApproved' => false         // Defaults to unapproved/pending status
+            ];
+
+            $res = supabase_request("POST", "tblreservation", $reservationData);
+
+            if ($res['status'] >= 200 && $res['status'] < 300) {
+                header("Location: calendar.php?reservation=success");
+                exit();
+            } else {
+                $error = "Failed to secure reservation. Please try again or check library rules.";
+            }
+        }
+    }
+
     $page_type = 'reserve-book';
     include 'includes/header.php';
-
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReServe - Reserve Book</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+
     <main class="auth-container">
         <div class="auth-card" style="max-width: 900px; padding: 4rem;">
             <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">RESERVE BOOK</h2>
             
+            <?php if (!empty($error)): ?>
+                <p style="color: var(--primary-red); text-align: center; font-weight: 700; margin-bottom: 2rem;">
+                    <?php echo htmlspecialchars($error); ?>
+                </p>
+            <?php endif; ?>
+
             <div style="text-align: center; margin-bottom: 4rem;">
-                <h3 style="font-size: 3.2rem; color: var(--primary-red); font-weight: 950; line-height: 1.1; margin-bottom: 0.5rem;">Lorem Ipsum Title</h3>
-                <div style="color: var(--accent-yellow); font-weight: 800; font-size: 1.3rem;">Author Name | 3rd Edition: 128 pages</div>
-                <p style="margin-top: 2rem; color: #333; font-size: 1rem; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto;">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                <h3 style="font-size: 3.2rem; color: var(--primary-red); font-weight: 950; line-height: 1.1; margin-bottom: 0.5rem;">
+                    <?php echo htmlspecialchars($book['title']); ?>
+                </h3>
+                <div style="color: var(--accent-yellow); font-weight: 800; font-size: 1.3rem;">
+                    <?php echo htmlspecialchars($book['author']); ?> | <?php echo htmlspecialchars($book['genre']); ?>
+                </div>
+                <p style="margin-top: 2rem; color: #333; font-size: 1rem; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <?php echo htmlspecialchars($book['description'] ?? 'No catalog description provided for this library title.'); ?>
+                </p>
             </div>
 
-            <form>
+            <form method="POST" action="reserve-book.php?id=<?php echo urlencode($target_book_id); ?>">
                 <div class="form-group">
                     <label for="start_date">DATE OF START</label>
-                    <input type="date" id="start_date" name="start_date">
+                    <input type="date" id="start_date" name="start_date" required min="<?php echo date('Y-m-d'); ?>">
                 </div>
                 <div class="form-group">
                     <label for="end_date">DATE OF END</label>
-                    <input type="date" id="end_date" name="end_date">
+                    <input type="date" id="end_date" name="end_date" required min="<?php echo date('Y-m-d'); ?>">
                 </div>
                 
-                <p style="text-align: center; color: var(--accent-yellow); font-weight: 800; margin-top: 3rem; font-size: 1.1rem;">By Reserving, I agree to the <a href="#" style="color: var(--accent-yellow);">Terms of Service</a> of the College Library.</p>
+                <p style="text-align: center; color: var(--accent-yellow); font-weight: 800; margin-top: 3rem; font-size: 1.1rem;">
+                    By Reserving, I agree to the <a href="#" style="color: var(--accent-yellow);">Terms of Service</a> of the College Library.
+                </p>
                 
-                <a href="confirm.php" class="btn-auth-submit" style="width: 50%; text-decoration: none; display: block; text-align: center; margin: 0 auto;">RESERVE</a>
+                <button type="submit" class="btn-auth-submit" style="width: 50%; border: none; cursor: pointer; display: block; margin: 5 auto; text-align: center;">
+                    RESERVE
+                </button>
             </form>
         </div>
     </main>
@@ -66,7 +132,4 @@
         </div>
     </section>
 
-    <?php include 'includes/footer.php'; ?>
-</body>
-</html>
-
+<?php include 'includes/footer.php'; ?>
